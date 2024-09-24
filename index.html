@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>DevOps 平台 Zadig 实例部署文档 - Aliyun 计算巢 x Zadigx</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#devops-zadig">DevOps 平台 Zadig 实例部署文档</a></li>
+              
+                  <li><a href="#_1">概述</a></li>
+                  
+              
+                  <li><a href="#ram">RAM账号所需权限</a></li>
+                  
+              
+                  <li><a href="#zadig">Zadig 服务资源配置</a></li>
+                  
+              
+                  <li><a href="#_2">部署流程</a></li>
+                  
+              
+                  <li><a href="#zadig_1">登录并授权 Zadig 系统</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="devops-zadig">DevOps 平台 Zadig 实例部署文档</h1>
+<blockquote>
+<p><strong>免责声明：</strong>本文档可能包含第三方产品信息，该信息仅供参考。阿里云对第三方产品的性能、可靠性以及操作可能带来的潜在影响，不做任何暗示或其他形式的承诺。</p>
+</blockquote>
+<h2 id="_1">概述</h2>
+<p>Zadig 是目前落地最为广泛的企业级云原生一体化 DevOps 价值链平台。Zadig 具备灵活易用的高并发工作流、面向开发者的云原生环境、高效协同的测试管理、强大免运维的模板库、客观精确的效能洞察以及云原生 IDE 插件以及发布编排工作流、客户中心等重要特性，为工程师提供统一的协作平面。Zadig 内置了 K8s YAML、Helm Chart、主机等复杂场景 最佳实践，适用云原生转型/上容器云、研发效能提升、大规模微服务环境治理、研发数字化转型等应用场景。在企业服务、数字化转型、新能源汽车领域数百家企业深入使用。<a href="https://v.qq.com/x/page/k3365nsmicy.html">视频地址</a></p>
+<h2 id="ram">RAM账号所需权限</h2>
+<p>Zadig 服务的创建需要对ECS、SLB和VPC等资源进行访问和创建操作，若您使用RAM账号创建服务实例，则需要在创建服务实例前，对使用的RAM账号添加相应资源的权限。添加RAM权限的详细操作，请参见<a href="https://help.aliyun.com/zh/ram/user-guide/grant-permissions-to-the-ram-user">为RAM用户授权</a>。</p>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>管理云服务器服务（ECS）的权限</td>
+</tr>
+<tr>
+<td>AliyunSLBFullAccess</td>
+<td>管理负载均衡服务（SLB）的权限</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>管理专有网络（VPC）的权限</td>
+</tr>
+<tr>
+<td>AliyunEIPFullAccess</td>
+<td>管理弹性公网IP（EIP）的权限</td>
+</tr>
+<tr>
+<td>AliyunCSFullAccess</td>
+<td>管理容器服务 (CS) 的权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="zadig">Zadig 服务资源配置</h2>
+<p>Zadig 服务需要一定资源才能安装并且顺利运行。 请根据具体工作流的并发量和自己环境中服务的资源需求决定，详情如下</p>
+<table>
+<thead>
+<tr>
+<th>服务</th>
+<th>计算资源消耗预估</th>
+<th>存储资源预估</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zadig 主服务</td>
+<td>4 vCPU 8GiB</td>
+<td>20GB</td>
+</tr>
+<tr>
+<td>Zadig 工作流</td>
+<td>至少工作流并发数量 * 1 vCPU 2GiB</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Zadig 创建环境</td>
+<td>根据需要创建的环境配置决定</td>
+<td>如果需要使用集群宿主机存储，根据环境配置决定</td>
+</tr>
+</tbody>
+</table>
+<p><strong>重要</strong> 存储空间可根据实际情况进行调整，但是不能少于20 GB。</p>
+<h2 id="_2">部署流程</h2>
+<p><strong>部署步骤</strong></p>
+<ol>
+<li>
+<p>点击部署链接购买商品并通过商品详情中的部署链接完成部署。</p>
+</li>
+<li>
+<p>服务实例部署成功后，通过服务部署的SLB负载均衡访问 Zadig 服务。</p>
+</li>
+</ol>
+<p><strong>注</strong>： 目前仅支持试用套餐进行试用。若想使用正式版本，请联系厂商。</p>
+<p><strong>部署参数说明</strong></p>
+<p>用户可以通过服务商在计算巢中发布的服务部署链接，一键部署阿里云资源和服务商提供的软件。用户在创建服务实例的过程中，需要配置服务实例信息，下文介绍 Zadig 服务需要配置的详细参数及注意事项。</p>
+<ul>
+<li><strong>地域</strong></li>
+</ul>
+<p>请结合实际情况选择合适地域，Zadig 服务目前适用于任何地域。</p>
+<p><img alt="地域" src="images/select_region.png" /></p>
+<ul>
+<li><strong>可用区</strong></li>
+</ul>
+<p>请根据实际可使用的可用区随意选择，Zadig 服务所需的机器目前只存在于部分可用区。</p>
+<p><img alt="可用区" src="images/partitions.png" /></p>
+<ul>
+<li><strong>实例密码</strong></li>
+</ul>
+<p>用于登陆自动创建的跳板机的密码，请根据实际情况填写并<strong>妥善保存</strong>。</p>
+<p><img alt="选择套餐" src="images/password.png" /></p>
+<h2 id="zadig_1">登录并授权 Zadig 系统</h2>
+<p>服务实例部署完成后，您可以通过访问实例中的 SLB 地址来访问 Zadig 系统</p>
+<ol>
+<li>
+<p>登录<a href="https://computenest.console.aliyun.com/#/vendor/cn-hangzhou/services">计算巢控制台</a>。</p>
+</li>
+<li>
+<p>在左侧导航栏，单击 <strong>服务实例管理</strong> 。</p>
+</li>
+<li>
+<p>在 <strong>私有部署服务</strong> 页签中，找到您创建的服务实例。</p>
+</li>
+<li>
+<p>单击创建的服务实例ID，进入服务实例详情页面。<img alt="服务实例详情" src="images/instance.png" /></p>
+</li>
+<li>
+<p>单击 Endpoint 访问 Zadig 系统，系统将会自动跳转至授权页面。<img alt="授权页面" src="images/auth_page.png" /></p>
+</li>
+<li>
+<p>输入服务详情页面中的 License， 即可进入系统进行使用 <img alt="许可证位置" src="images/license.png" /></p>
+</li>
+</ol>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2024-09-24 03:16:12.009705+00:00
+  -->
+</body>
+</html>
